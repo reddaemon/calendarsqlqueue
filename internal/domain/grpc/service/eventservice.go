@@ -4,13 +4,9 @@ import (
 	"context"
 	"errors"
 
-	//	"github.com/labstack/gommon/log"
-	"github.com/reddaemon/calendargrpcsql/app"
-	"github.com/reddaemon/calendargrpcsql/models/models"
-
-	//	"github.com/reddaemon/calendargrpcsql/models/storage"
-	//	"sync"
 	"time"
+
+	"github.com/reddaemon/calendarsqlqueue/models/models"
 )
 
 type Repo interface {
@@ -21,13 +17,12 @@ type Repo interface {
 }
 
 type EventUseCase struct {
-	App            *app.App
 	eventRepo      Repo
 	contextTimeout time.Duration
 }
 
-func NewEventUseCase(app *app.App, eventRepo Repo, contextTimeout time.Duration) *EventUseCase {
-	return &EventUseCase{App: app, eventRepo: eventRepo, contextTimeout: contextTimeout}
+func NewEventUsecase(eventRepo Repo, contextTimeout time.Duration) *EventUseCase {
+	return &EventUseCase{eventRepo: eventRepo, contextTimeout: contextTimeout}
 }
 
 func (e *EventUseCase) Create(ctx context.Context, event *models.Event) (*models.Event, error) {

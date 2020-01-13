@@ -1,7 +1,11 @@
 package cmd
 
 import (
-	"github.com/labstack/gommon/log"
+	"log"
+
+	"github.com/reddaemon/calendarsqlqueue/config"
+	"github.com/reddaemon/calendarsqlqueue/logger"
+	"github.com/reddaemon/calendarsqlqueue/queue"
 	"github.com/spf13/cobra"
 )
 
@@ -14,15 +18,25 @@ var notifier = &cobra.Command{
 	Short: "sender",
 	Long:  "sender",
 	Run: func(cmd *cobra.Command, args []string) {
-		a := getApp()
-		defer a.Amqp.Close()
-		ch, err := a.Amqp.Channel()
+		c, err := config.GetConfig()
+		if err != nil {
+			log.Fatalf("unable to load config: %v", err)
+		}
+		l, err := logger.GetLogger(c)
+		if err != nil {
+			log.Fatalf("unable to load logger")
+		}
+
+		amqpq := queue.GetConnection(c)
+
+		ch, err := amqpq.Channel()
+
 		if err != nil {
 			log.Fatalf("Failed to open amqp channel")
 		}
-
+		defer ch.Close()
 		err = ch.ExchangeDeclare(
-			a.Config.Broker.Exchange,
+			c.Broker["exchange"],
 			"fanout",
 			true,
 			false,
@@ -36,7 +50,7 @@ var notifier = &cobra.Command{
 		}
 
 		q, err := ch.QueueDeclare(
-			a.Config.Broker.Queue,
+			c.Broker["queue"],
 			true,
 			false,
 			false,
@@ -50,11 +64,11 @@ var notifier = &cobra.Command{
 		err = ch.QueueBind(
 			q.Name,
 			"",
-			a.Config.Broker.Exchange,
+			c.Broker["exchange"],
 			false,
 			nil)
 		if err != nil {
-			log.Fatalf("Unable to bind queue")
+			l.Fatal("Unable to bind queue")
 		}
 
 		msgs, err := ch.Consume(
@@ -66,7 +80,7 @@ var notifier = &cobra.Command{
 			false,
 			nil)
 		if err != nil {
-			log.Fatalf("Unable to register consumer")
+			l.Fatal("Unable to register consumer")
 		}
 
 		always := make(chan bool)

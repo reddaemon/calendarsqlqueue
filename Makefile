@@ -8,11 +8,8 @@ tidy:
 	go mod tidy
 verify:
 	go mod verify
-imports:
-	goimports -w
-precommit: fmt vet lint tidy verify imports
+precommit: fmt vet lint tidy verify
 gen-proto:
 	protoc protofiles/event.proto --go_out=plugins=grpc:.
-build:
-	gen-proto
-	go build main.go
+build: gen-proto
+	go build -o ./calendar

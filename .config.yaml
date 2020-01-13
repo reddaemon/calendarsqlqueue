@@ -1,0 +1,16 @@
+debug: true
+host: localhost
+port: 8080
+db:
+  - user: events
+  - pass: changeme
+  - host: 127.0.0.1
+  - port: 5432
+  - name: events
+broker:
+  - user: guest
+  - pass: guest
+  - host: 127.0.0.1
+  - port: 5672
+  - exchange: events
+  - queue: events

@@ -24,7 +24,7 @@ func main() {
 	}
 	defer cc.Close()
 	c := api.NewEventServiceClient(cc)
-	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Second)
 	defer cancel()
 
 	inCreate := &api.CreateRequest{

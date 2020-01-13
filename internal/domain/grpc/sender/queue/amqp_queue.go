@@ -3,45 +3,51 @@ package queue
 import (
 	"encoding/json"
 
-	"fmt"
+	"github.com/labstack/gommon/log"
 
-	"github.com/reddaemon/calendarsqlqueue/app"
+	"github.com/reddaemon/calendarsqlqueue/config"
+	"go.uber.org/zap"
+
 	"github.com/reddaemon/calendarsqlqueue/models/models"
 	"github.com/streadway/amqp"
 )
 
 type EventQueue struct {
-	app *app.App
+	Config *config.Config
+	Logger *zap.Logger
+	Conn   *amqp.Connection
 }
 
-func NewEventQueue(app *app.App) *EventQueue {
-	return &EventQueue{app: app}
+func NewEventQueue(config *config.Config, logger *zap.Logger, conn *amqp.Connection) *EventQueue {
+	return &EventQueue{Config: config, Logger: logger, Conn: conn}
 }
 
 func (a EventQueue) GetEvent(event *models.Event) error {
-	ch, err := a.app.Amqp.Channel()
+	ch, err := a.Conn.Channel()
 	if err != nil {
 		return err
 	}
 	defer ch.Close()
 	body, err := json.Marshal(event)
 	if err != nil {
+		log.Fatalf(err.Error())
 		return err
 	}
 
 	err = ch.Publish(
-		a.app.Config.Broker.Exchange,
+		a.Config.Broker["exchange"],
 		"",
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/plaint",
+			ContentType: "text/plain",
 			Body:        body,
 		})
 	if err != nil {
+		log.Fatalf("unable to publish to exchange")
 		return err
 	}
-	a.app.Logger.Info(fmt.Sprintf("Sent %s", body))
+	log.Printf("Sent %s", body)
 
 	return nil
 }

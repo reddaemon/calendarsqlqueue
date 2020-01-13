@@ -5,7 +5,6 @@ import (
 
 	"github.com/reddaemon/calendarsqlqueue/models/models"
 
-	"github.com/reddaemon/calendarsqlqueue/app"
 	"golang.org/x/net/context"
 )
 
@@ -18,7 +17,6 @@ type Queue interface {
 }
 
 type EventUseCase struct {
-	App            *app.App
 	eventRepo      Repository
 	queue          Queue
 	contextTimeout time.Duration
@@ -28,8 +26,8 @@ type Repository interface {
 	GetByDate(ctx context.Context, date time.Time) ([]models.Event, error)
 }
 
-func NewEventUseCase(app *app.App, eventRepo Repository, queue Queue, contextTimeout time.Duration) *EventUseCase {
-	return &EventUseCase{App: app, eventRepo: eventRepo, queue: queue, contextTimeout: contextTimeout}
+func NewEventUseCase(eventRepo Repository, queue Queue, contextTimeout time.Duration) *EventUseCase {
+	return &EventUseCase{eventRepo: eventRepo, queue: queue, contextTimeout: contextTimeout}
 }
 
 func (e EventUseCase) GetEvent(ctx context.Context, date time.Time) error {

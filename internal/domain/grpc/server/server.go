@@ -4,20 +4,24 @@ import (
 	"context"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/labstack/gommon/log"
-	"github.com/reddaemon/calendargrpcsql/internal/domain/grpc/service"
-	"github.com/reddaemon/calendargrpcsql/models/models"
-	eventpb "github.com/reddaemon/calendargrpcsql/protofiles"
+	"github.com/reddaemon/calendarsqlqueue/internal/domain/grpc/service"
+	"github.com/reddaemon/calendarsqlqueue/models/models"
+	eventpb "github.com/reddaemon/calendarsqlqueue/protofiles"
 )
 
 type Server struct {
 	*service.EventUseCase
+	*zap.Logger
 }
 
-func NewServer(usecase *service.EventUseCase) *Server {
+func NewServer(usecase *service.EventUseCase, logger *zap.Logger) *Server {
 	return &Server{
 		EventUseCase: usecase,
+		Logger:       logger,
 	}
 }
 

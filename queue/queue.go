@@ -11,11 +11,12 @@ import (
 
 func GetConnection(c *config.Config) *amqp.Connection {
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/",
-		c.Broker.User,
-		c.Broker.Pass,
-		c.Broker.Host,
-		c.Broker.Port,
+		c.Broker["user"],
+		c.Broker["pass"],
+		c.Broker["host"],
+		c.Broker["port"],
 	))
+
 	if err != nil {
 		log.Fatalf("unable to connect to Rabbitmq: %v", err)
 	}
@@ -26,7 +27,7 @@ func GetConnection(c *config.Config) *amqp.Connection {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		c.Broker.Exchange,
+		c.Broker["exchange"],
 		"fanout",
 		true,
 		false,
