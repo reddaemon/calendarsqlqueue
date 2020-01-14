@@ -10,6 +10,8 @@ import (
 )
 
 func init() {
+	notifier.Flags().StringVar(&configPath, "config", "", "Config file path")
+	notifier.MarkFlagRequired("config")
 	rootCmd.AddCommand(notifier)
 }
 
@@ -18,7 +20,7 @@ var notifier = &cobra.Command{
 	Short: "sender",
 	Long:  "sender",
 	Run: func(cmd *cobra.Command, args []string) {
-		c, err := config.GetConfig()
+		c, err := config.GetConfig(configPath)
 		if err != nil {
 			log.Fatalf("unable to load config: %v", err)
 		}

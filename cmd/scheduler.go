@@ -18,6 +18,8 @@ import (
 )
 
 func init() {
+	scheduler.Flags().StringVar(&configPath, "config", "", "Config file path")
+	scheduler.MarkFlagRequired("config")
 	rootCmd.AddCommand(scheduler)
 }
 
@@ -26,7 +28,7 @@ var scheduler = &cobra.Command{
 	Short: "Start scheduler server",
 	Long:  "Start scheduler server",
 	Run: func(cmd *cobra.Command, args []string) {
-		c, err := config.GetConfig()
+		c, err := config.GetConfig(configPath)
 		if err != nil {
 			log.Fatal("unable to get config")
 		}

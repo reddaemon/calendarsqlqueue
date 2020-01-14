@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -12,11 +11,17 @@ var rootCmd = &cobra.Command{
 	Short: "Calendar service",
 	Long:  `Calendar service`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Print("Use calendar [command]\nRun 'calendar --help' for usage.\n")
+		log.Printf("Use calendar [command]\nRun 'calendar --help' for usage.\n configPath == %s", configPath)
 	},
 }
 
 func Execute() {
+	rootCmd.Flags().StringVarP(&configPath, "config", "c", "",
+		"Config file path")
+	err := rootCmd.MarkFlagRequired("config")
+	if err != nil {
+		panic("rootCmd.MarkFlagRequired() failed")
+	}
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("root execute error: %v", err)
 	}

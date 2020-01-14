@@ -2,7 +2,7 @@
 
 ```
 make build
-./calendar serve
+./calendar api
 ./calendar scheduler
 ./calendar sender
 ```

@@ -19,16 +19,22 @@ import (
 	"google.golang.org/grpc"
 )
 
+var configPath string
+
 func init() {
-	rootCmd.AddCommand(serve)
+	api.Flags().StringVar(&configPath, "config", "", "Config file path")
+	api.MarkFlagRequired("config")
+
+	rootCmd.AddCommand(api)
 }
 
-var serve = &cobra.Command{
-	Use:   "serve",
-	Short: "Start calendar server",
-	Long:  `Start calendar server`,
+var api = &cobra.Command{
+	Use:   "api",
+	Short: "Start calendar api server",
+	Long:  `Start calendar api server`,
 	Run: func(cmd *cobra.Command, args []string) {
-		c, err := config.GetConfig()
+
+		c, err := config.GetConfig(configPath)
 		if err != nil {
 			log.Fatalf("unable to load config: %v", err)
 		}
