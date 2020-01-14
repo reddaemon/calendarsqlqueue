@@ -12,4 +12,8 @@ precommit: fmt vet lint tidy verify
 gen-proto:
 	protoc protofiles/event.proto --go_out=plugins=grpc:.
 build: gen-proto
-	go build -o ./calendar
+	go build -o calendar_api cmd/api/*.go
+	go build -o calendar_scheduler cmd/scheduler/*.go
+	go build -o calendar_sender cmd/notifier/*.go
+	go build -o calendar_client client/*.go
+

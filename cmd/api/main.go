@@ -7,6 +7,9 @@ import (
 	"net"
 	"time"
 
+	_ "github.com/jackc/pgx/stdlib"
+	_ "github.com/lib/pq"
+
 	"github.com/reddaemon/calendarsqlqueue/internal/database/postgres"
 
 	"flag"
@@ -21,7 +24,8 @@ import (
 )
 
 func main() {
-	configPath := flag.String("configPath", "config.yml", "path to config file")
+	configPath := flag.String("config", "config.yml", "path to config file")
+	flag.Parse()
 	c, err := config.GetConfig(*configPath)
 	if err != nil {
 		log.Fatalf("unable to load config: %v", err)

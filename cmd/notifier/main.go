@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/reddaemon/calendarsqlqueue/config"
@@ -9,7 +10,9 @@ import (
 )
 
 func main() {
-	c, err := config.GetConfig(NotifConfigPath)
+	NotifConfigPath := flag.String("config", "config.yml", "path to config file")
+	flag.Parse()
+	c, err := config.GetConfig(*NotifConfigPath)
 	if err != nil {
 		log.Fatalf("unable to load config: %v", err)
 	}

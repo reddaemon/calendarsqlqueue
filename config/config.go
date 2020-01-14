@@ -1,6 +1,9 @@
 package config
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/labstack/gommon/log"
 	"github.com/spf13/viper"
 )
@@ -15,9 +18,10 @@ type Config struct {
 
 func GetConfig(configPath string) (*Config, error) {
 	var config Config
-	viper.SetConfigName(".config")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath(configPath)
+	splits := strings.Split(filepath.Base(configPath), ".")
+	viper.SetConfigName(filepath.Base(splits[0]))
+	viper.AddConfigPath(filepath.Dir(configPath))
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatalf("Unable to get config %s", err)

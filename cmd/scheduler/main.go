@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"time"
 
@@ -20,7 +21,9 @@ import (
 )
 
 func main() {
-	c, err := config.GetConfig(SchedConfigPath)
+	SchedConfigPath := flag.String("config", "config.yml", "path to config file")
+	flag.Parse()
+	c, err := config.GetConfig(*SchedConfigPath)
 	if err != nil {
 		log.Fatal("unable to get config")
 	}
