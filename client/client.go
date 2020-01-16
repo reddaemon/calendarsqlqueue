@@ -18,7 +18,7 @@ var updateResponse *api.UpdateResponse
 //var deleteResponse api.UpdateResponse
 
 func main() {
-	cc, err := grpc.Dial("localhost:8080", grpc.WithInsecure())
+	cc, err := grpc.Dial("localhost:8888", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
 	}
