@@ -16,4 +16,6 @@ build: gen-proto
 	go build -o calendar_scheduler cmd/scheduler/*.go
 	go build -o calendar_sender cmd/notifier/*.go
 	go build -o calendar_client client/*.go
+up:
+	docker-compose -f docker/docker-compose/docker-compose.yml up -d
 
