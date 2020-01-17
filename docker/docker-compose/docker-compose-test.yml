@@ -1,0 +1,97 @@
+---
+version: '3.7'
+
+services:
+  calendar_api:
+    build:
+      context: ../..
+      dockerfile: docker/api/Dockerfile
+    volumes:
+      - type: bind
+        source: ../../config.yaml
+        target: /opt/calendar_api/config.yaml
+        read_only: true
+    networks:
+      - db
+      - calendar_api
+    ports:
+      - 8888:8080
+    depends_on:
+      - db
+    restart: on-failure
+
+  calendar_scheduler:
+    build:
+      context: ../..
+      dockerfile: docker/scheduler/Dockerfile
+    volumes:
+      - type: bind
+        source: ../../config_scheduler.yaml
+        target: /opt/calendar_scheduler/config.yaml
+        read_only: true
+    networks:
+      - db
+      - queue
+    depends_on:
+      - db
+      - queue
+    restart: on-failure
+
+  calendar_sender:
+    build:
+      context: ../..
+      dockerfile: docker/sender/Dockerfile
+    volumes:
+      - type: bind
+        source: ../../config_sender.yaml
+        target: /opt/calendar_sender/config.yaml
+        read_only: true
+    networks:
+      - queue
+    depends_on:
+      - queue
+      - calendar_scheduler
+    restart: on-failure
+
+  integr_tests:
+    build:
+      context: ../..
+      dockerfile: docker/integr_test/Dockerfile
+    depends_on:
+      - calendar_api
+    environment:
+      EVENT_SERVICE: "calendar_api:8080"
+    networks:
+      - db
+      - queue
+      - calendar_api
+  db:
+    image: postgres:10-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../../migrations/001.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - db
+    environment:
+      POSTGRES_USER: events
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: events
+
+  queue:
+    image: rabbitmq:3.8-management-alpine
+    restart: always
+    networks:
+      - queue
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+networks:
+  db:
+    driver: bridge
+  queue:
+    driver: bridge
+  calendar_api:
+    driver: bridge
