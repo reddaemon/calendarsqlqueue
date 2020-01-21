@@ -3,13 +3,32 @@ package main
 import (
 	"flag"
 	"log"
+	"net/http"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/reddaemon/calendarsqlqueue/config"
 	"github.com/reddaemon/calendarsqlqueue/logger"
 	"github.com/reddaemon/calendarsqlqueue/queue"
 )
 
+var (
+	counter = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "sender_notifications_total",
+			Help: "Sent notifications counter",
+		},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(counter)
+}
+
 func main() {
+	go runPrometheusServer()
 	NotifConfigPath := flag.String("config", "config.yml", "path to config file")
 	flag.Parse()
 	c, err := config.GetConfig(*NotifConfigPath)
@@ -87,4 +106,10 @@ func main() {
 
 	log.Printf("To exit press CTRL + C")
 	<-always
+}
+
+func runPrometheusServer() {
+	log.Println("run prometheus exporter server")
+	http.Handle("/metrics", promhttp.Handler())
+	_ = http.ListenAndServe(":9187", nil)
 }

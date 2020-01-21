@@ -6,6 +6,8 @@ services:
     build:
       context: ../..
       dockerfile: docker/api/Dockerfile
+    environment:
+      GRPC_VERBOSITY: debug
     volumes:
       - type: bind
         source: ../../config.yaml
@@ -13,8 +15,10 @@ services:
         read_only: true
     networks:
       - db
+      - monitoring
     ports:
       - 8888:8080
+      - 9187:9187
     depends_on:
       - db
     restart: on-failure
@@ -47,6 +51,7 @@ services:
         read_only: true
     networks:
       - queue
+      - monitoring
     depends_on:
       - queue
       - calendar_scheduler
@@ -75,8 +80,37 @@ services:
       - "15672:15672"
       - "5672:5672"
 
+  postgres-exporter:
+    build:
+      context: ../..
+      dockerfile: docker/postgres_exporter/Dockerfile
+      network: host
+    environment:
+      DATA_SOURCE_NAME: "postgres://events:changeme@db:5432/events?sslmode=disable"
+      PG_EXPORTER_DISABLE_DEFAULT_METRICS: "false"
+      PG_EXPORTED_DISABLE_SETTINGS_METRICS: "false"
+      PG_EXPORTER_EXTEND_QUERY_PATH: "./config/queries.yml"
+    ports:
+      - 9188:9188
+    networks:
+      - monitoring
+      - db
+    depends_on:
+      - db
+
+  prometheus:
+    build:
+      context: ../..
+      dockerfile: docker/prometheus/Dockerfile
+      network: host
+    ports:
+      - 9090:9090
+    networks:
+      - monitoring
 networks:
   db:
     driver: bridge
   queue:
+    driver: bridge
+  monitoring:
     driver: bridge

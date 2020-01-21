@@ -20,6 +20,8 @@ up:
 	docker-compose -f docker/docker-compose/docker-compose.yml up -d
 down:
 	docker-compose -f docker/docker-compose/docker-compose.yml down
+up-build:
+	docker-compose -f docker/docker-compose/docker-compose.yml up --build -d
 test:
 	set -e ;\
 	docker-compose -f docker/docker-compose/docker-compose-test.yml up --build -d ;\

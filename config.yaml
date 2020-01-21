@@ -1,3 +1,4 @@
+environment: dev
 debug: true
 host: 0.0.0.0
 port: 8080
@@ -14,3 +15,5 @@ broker:
   - port: 5672
   - exchange: events
   - queue: events
+monitoring:
+  - host: :9091

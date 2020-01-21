@@ -9,11 +9,21 @@ import (
 )
 
 type Config struct {
-	Debug  bool
-	Host   string
-	Port   string
-	Db     map[string]string
-	Broker map[string]string
+	Environment string
+	Debug       bool
+	Host        string
+	Port        string
+	Db          map[string]string
+	Broker      map[string]string
+	Monitoring  map[string]string
+}
+
+func (c *Config) IsProduction() bool {
+	return c.Environment == "production"
+}
+
+func (c *Config) IsDevelopment() bool {
+	return c.Environment == "dev"
 }
 
 func GetConfig(configPath string) (*Config, error) {

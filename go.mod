@@ -7,11 +7,13 @@ require (
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.3.2
+	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgx v3.6.0+incompatible
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.3.0
+	github.com/prometheus/client_golang v0.9.3
 	github.com/reddaemon/calendargrpcsql v0.0.0-20191226150206-63f6ed7a8ee1
 	github.com/shopspring/decimal v0.0.0-20200105231215-408a2507e114 // indirect
 	github.com/spf13/cobra v0.0.0-20170417170307-b6cb39589372

@@ -16,4 +16,4 @@ ENV NAME "calendar_api"
 WORKDIR /opt/${NAME}
 COPY --from=build /opt/${NAME}/bin/${NAME} ./${NAME}
 RUN apk add --no-cache tzdata
-CMD ./${NAME} --config config.yaml
+CMD GRPC_GO_LOG_VERBOSITY_LEVEL=99 GRPC_GO_LOG_SEVERITY_LEVEL=info ./${NAME} --config config.yaml
