@@ -1,16 +1,19 @@
+environment: dev
 debug: true
-host: localhost
+host: 0.0.0.0
 port: 8080
 db:
   - user: events
   - pass: changeme
-  - host: 127.0.0.1
+  - host: db
   - port: 5432
   - name: events
 broker:
   - user: guest
   - pass: guest
-  - host: 127.0.0.1
+  - host: queue
   - port: 5672
   - exchange: events
   - queue: events
+monitoring:
+  - host: :9091

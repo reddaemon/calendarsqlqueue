@@ -4,11 +4,16 @@ import (
 	"fmt"
 	"time"
 
+	"google.golang.org/grpc"
+
+	"github.com/prometheus/client_golang/prometheus"
+
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/labstack/gommon/log"
 	api "github.com/reddaemon/calendargrpcsql/protofiles"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 )
 
 var createResponse *api.CreateResponse
@@ -18,7 +23,14 @@ var updateResponse *api.UpdateResponse
 //var deleteResponse api.UpdateResponse
 
 func main() {
-	cc, err := grpc.Dial("localhost:8080", grpc.WithInsecure())
+	reg := prometheus.NewRegistry()
+	grpcMetrics := grpc_prometheus.NewClientMetrics()
+	reg.MustRegister(grpcMetrics)
+	cc, err := grpc.Dial("127.0.0.1:8888",
+		//grpc.WithUnaryInterceptor(grpcMetrics.UnaryClientInterceptor()),
+		//grpc.WithStreamInterceptor(grpcMetrics.StreamClientInterceptor()),
+		grpc.WithInsecure(),
+	)
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
 	}
@@ -55,7 +67,7 @@ func main() {
 	}
 	createResponse, err = c.Create(ctx, inCreate)
 	if err != nil {
-		fmt.Println(createResponse, err)
+		fmt.Println("CREATE:", createResponse, err)
 	}
 
 	fmt.Printf("%v\n", createResponse)

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -12,7 +11,7 @@ var rootCmd = &cobra.Command{
 	Short: "Calendar service",
 	Long:  `Calendar service`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Print("Use calendar [command]\nRun 'calendar --help' for usage.\n")
+		log.Printf("Use calendar [command]\nRun 'calendar --help' for usage.")
 	},
 }
 

@@ -1,0 +1,9 @@
+pg_stat_user_tables:
+  query: select current_database() as datname, n_live_tup as event_count from events.pg_catalog.pg_stat_user_tables where relname='events'
+  metrics:
+    - datname:
+        usage: "LABEL"
+        description: "Database name"
+    - event_count:
+        usage: "COUNTER"
+        description: "Events count"

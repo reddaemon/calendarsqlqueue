@@ -1,0 +1,116 @@
+---
+version: '3.7'
+
+services:
+  calendar_api:
+    build:
+      context: ../..
+      dockerfile: docker/api/Dockerfile
+    environment:
+      GRPC_VERBOSITY: debug
+    volumes:
+      - type: bind
+        source: ../../config.yaml
+        target: /opt/calendar_api/config.yaml
+        read_only: true
+    networks:
+      - db
+      - monitoring
+    ports:
+      - 8888:8080
+      - 9187:9187
+    depends_on:
+      - db
+    restart: on-failure
+
+  calendar_scheduler:
+    build:
+      context: ../..
+      dockerfile: docker/scheduler/Dockerfile
+    volumes:
+      - type: bind
+        source: ../../config_scheduler.yaml
+        target: /opt/calendar_scheduler/config.yaml
+        read_only: true
+    networks:
+      - db
+      - queue
+    depends_on:
+      - db
+      - queue
+    restart: on-failure
+
+  calendar_sender:
+    build:
+      context: ../..
+      dockerfile: docker/sender/Dockerfile
+    volumes:
+      - type: bind
+        source: ../../config_sender.yaml
+        target: /opt/calendar_sender/config.yaml
+        read_only: true
+    networks:
+      - queue
+      - monitoring
+    depends_on:
+      - queue
+      - calendar_scheduler
+    restart: on-failure
+
+  db:
+    image: postgres:10-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../../migrations/001.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - db
+    environment:
+      POSTGRES_USER: events
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: events
+
+  queue:
+    image: rabbitmq:3.8-management-alpine
+    restart: always
+    networks:
+      - queue
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  postgres-exporter:
+    build:
+      context: ../..
+      dockerfile: docker/postgres_exporter/Dockerfile
+      network: host
+    environment:
+      DATA_SOURCE_NAME: "postgres://events:changeme@db:5432/events?sslmode=disable"
+      PG_EXPORTER_DISABLE_DEFAULT_METRICS: "false"
+      PG_EXPORTED_DISABLE_SETTINGS_METRICS: "false"
+      PG_EXPORTER_EXTEND_QUERY_PATH: "./config/queries.yml"
+    ports:
+      - 9188:9188
+    networks:
+      - monitoring
+      - db
+    depends_on:
+      - db
+
+  prometheus:
+    build:
+      context: ../..
+      dockerfile: docker/prometheus/Dockerfile
+      network: host
+    ports:
+      - 9090:9090
+    networks:
+      - monitoring
+networks:
+  db:
+    driver: bridge
+  queue:
+    driver: bridge
+  monitoring:
+    driver: bridge

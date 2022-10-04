@@ -1,8 +1,13 @@
-запуск:
+запуск docker-compose:
 
 ```
+make up
+```
+
+cборка:
+```
 make build
-./calendar serve
+./calendar api
 ./calendar scheduler
 ./calendar sender
 ```
