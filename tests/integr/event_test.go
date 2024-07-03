@@ -2,13 +2,14 @@ package integr
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"log"
 	"os"
 	"time"
 
-	"github.com/DATA-DOG/godog"
-	"github.com/golang/protobuf/ptypes/timestamp"
-	eventpb "github.com/reddaemon/calendarsqlqueue/protofiles"
-	"golang.org/x/net/context"
+	"context"
+	"github.com/cucumber/godog"
+	eventpb "github.com/reddaemon/calendarsqlqueue/protofiles/protofiles/api"
 	"google.golang.org/grpc"
 )
 
@@ -25,11 +26,16 @@ func init() {
 }
 
 func iCallGrpcEventMethodCreate() error {
-	conn, err := grpc.Dial(eventServer, grpc.WithInsecure())
+	conn, err := grpc.NewClient(eventServer, grpc.WithTransportCredentials(nil))
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func(conn *grpc.ClientConn) {
+		err = conn.Close()
+		if err != nil {
+			log.Fatalf("unable to close connection: %v", err)
+		}
+	}(conn)
 
 	cli := eventpb.NewEventServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
@@ -39,9 +45,7 @@ func iCallGrpcEventMethodCreate() error {
 		Event: &eventpb.Event{
 			Title:       "Create event test",
 			Description: "Create event test",
-			Date: &timestamp.Timestamp{
-				Seconds: time.Now().Unix(),
-			},
+			Date:        timestamppb.New(time.Now()),
 		},
 	}
 	createResponse, respErr = cli.Create(ctx, inCreate)
@@ -76,9 +80,7 @@ func iCallGrpcEventMethodUpdate() error {
 		Event: &eventpb.Event{
 			Title:       "Update event",
 			Description: "Update event",
-			Date: &timestamp.Timestamp{
-				Seconds: time.Now().Unix(),
-			},
+			Date:        timestamppb.New(time.Now()),
 		},
 	}
 
@@ -94,7 +96,7 @@ func theUpdateResponseSuccessShouldBeTrue() error {
 	return nil
 }
 
-func FeatureContext(s *godog.Suite) {
+func FeatureContext(s *godog.ScenarioContext) {
 	s.Step(`^I call grpc event method Create$`, iCallGrpcEventMethodCreate)
 	s.Step(`^The error should be nil$`, theErrorShouldBeNil)
 

@@ -3,8 +3,8 @@ package app
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/gommon/log"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/reddaemon/calendarsqlqueue/config"
-	"github.com/streadway/amqp"
 )
 
 type App struct {

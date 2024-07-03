@@ -5,8 +5,8 @@ import (
 
 	"github.com/labstack/gommon/log"
 
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/reddaemon/calendarsqlqueue/config"
-	"github.com/streadway/amqp"
 )
 
 func GetConnection(c *config.Config) *amqp.Connection {
@@ -24,7 +24,12 @@ func GetConnection(c *config.Config) *amqp.Connection {
 	if err != nil {
 		log.Fatalf("unable to get queue channel: %v", err)
 	}
-	defer ch.Close()
+	defer func(ch *amqp.Channel) {
+		err = ch.Close()
+		if err != nil {
+			log.Fatalf("unable to close channel: %v", err)
+		}
+	}(ch)
 
 	err = ch.ExchangeDeclare(
 		c.Broker["exchange"],
