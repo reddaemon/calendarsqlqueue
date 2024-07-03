@@ -26,15 +26,16 @@ func main() {
 	reg := prometheus.NewRegistry()
 	grpcMetrics := grpc_prometheus.NewClientMetrics()
 	reg.MustRegister(grpcMetrics)
-	cc, err := grpc.Dial("127.0.0.1:8888",
-		//grpc.WithUnaryInterceptor(grpcMetrics.UnaryClientInterceptor()),
-		//grpc.WithStreamInterceptor(grpcMetrics.StreamClientInterceptor()),
-		grpc.WithInsecure(),
-	)
+	cc, err := grpc.NewClient("127.0.0.1:8888", grpc.WithTransportCredentials(nil))
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
 	}
-	defer cc.Close()
+	defer func(cc *grpc.ClientConn) {
+		err = cc.Close()
+		if err != nil {
+			log.Fatalf("unable to close connection: %v", err)
+		}
+	}(cc)
 	c := api.NewEventServiceClient(cc)
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Second)
 	defer cancel()

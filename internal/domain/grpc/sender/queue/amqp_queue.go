@@ -27,7 +27,12 @@ func (a EventQueue) GetEvent(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	defer ch.Close()
+	defer func(ch *amqp.Channel) {
+		err := ch.Close()
+		if err != nil {
+			log.Fatalf("unable to close channel")
+		}
+	}(ch)
 	body, err := json.Marshal(event)
 	if err != nil {
 		log.Fatalf(err.Error())
