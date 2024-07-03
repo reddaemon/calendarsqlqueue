@@ -5,7 +5,7 @@ import (
 
 	"github.com/reddaemon/calendarsqlqueue/models/models"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 type Usecase interface {

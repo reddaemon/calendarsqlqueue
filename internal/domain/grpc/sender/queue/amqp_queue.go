@@ -8,8 +8,8 @@ import (
 	"github.com/reddaemon/calendarsqlqueue/config"
 	"go.uber.org/zap"
 
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/reddaemon/calendarsqlqueue/models/models"
-	"github.com/streadway/amqp"
 )
 
 type EventQueue struct {

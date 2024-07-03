@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
 	"google.golang.org/grpc"
@@ -10,10 +11,9 @@ import (
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 
-	"github.com/golang/protobuf/ptypes/timestamp"
+	"context"
 	"github.com/labstack/gommon/log"
-	api "github.com/reddaemon/calendargrpcsql/protofiles"
-	"golang.org/x/net/context"
+	api "github.com/reddaemon/calendarsqlqueue/protofiles/protofiles/api"
 )
 
 var createResponse *api.CreateResponse
@@ -43,9 +43,7 @@ func main() {
 		Event: &api.Event{
 			Title:       "Test",
 			Description: "testing",
-			Date: &timestamp.Timestamp{
-				Seconds: time.Now().Unix(),
-			},
+			Date:        timestamppb.New(time.Now()),
 		},
 	}
 
@@ -54,9 +52,7 @@ func main() {
 		Event: &api.Event{
 			Title:       "Test1",
 			Description: "Behavior testing1",
-			Date: &timestamp.Timestamp{
-				Seconds: time.Now().Unix(),
-			},
+			Date:        timestamppb.New(time.Now()),
 		},
 	}
 	inRead := api.ReadRequest{

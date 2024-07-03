@@ -13,7 +13,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	_ "github.com/jackc/pgx/stdlib"
+	_ "github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 
 	"github.com/reddaemon/calendarsqlqueue/internal/database/postgres"
@@ -28,7 +28,7 @@ import (
 	"github.com/reddaemon/calendarsqlqueue/internal/domain/grpc/server"
 	"github.com/reddaemon/calendarsqlqueue/internal/domain/grpc/service"
 	"github.com/reddaemon/calendarsqlqueue/logger"
-	eventpb "github.com/reddaemon/calendarsqlqueue/protofiles"
+	eventpb "github.com/reddaemon/calendarsqlqueue/protofiles/protofiles/api"
 	"google.golang.org/grpc"
 )
 

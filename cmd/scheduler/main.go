@@ -5,16 +5,16 @@ import (
 	"log"
 	"time"
 
-	_ "github.com/jackc/pgx/stdlib"
+	_ "github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 
 	"github.com/reddaemon/calendarsqlqueue/internal/database/postgres"
 
+	"context"
 	"github.com/reddaemon/calendarsqlqueue/config"
 	dbc "github.com/reddaemon/calendarsqlqueue/db"
 	"github.com/reddaemon/calendarsqlqueue/logger"
 	qc "github.com/reddaemon/calendarsqlqueue/queue"
-	"golang.org/x/net/context"
 
 	"github.com/reddaemon/calendarsqlqueue/internal/domain/grpc/sender"
 	"github.com/reddaemon/calendarsqlqueue/internal/domain/grpc/sender/queue"

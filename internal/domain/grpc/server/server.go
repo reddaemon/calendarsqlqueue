@@ -2,18 +2,19 @@ package server
 
 import (
 	"context"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
 	"go.uber.org/zap"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/labstack/gommon/log"
 	"github.com/reddaemon/calendarsqlqueue/internal/domain/grpc/service"
 	"github.com/reddaemon/calendarsqlqueue/models/models"
-	eventpb "github.com/reddaemon/calendarsqlqueue/protofiles"
+	eventpb "github.com/reddaemon/calendarsqlqueue/protofiles/protofiles/api"
 )
 
 type Server struct {
+	eventpb.UnimplementedEventServiceServer
 	*service.EventUseCase
 	*zap.Logger
 }
@@ -87,7 +88,7 @@ func (s *Server) unmarshalPbEvent(e *eventpb.Event) models.Event {
 		Id:          uint64(e.GetId()),
 		Title:       e.GetTitle(),
 		Description: e.GetDescription(),
-		Date:        ptypes.TimestampString(e.GetDate()),
+		Date:        e.GetDate().AsTime().Format(time.RFC3339),
 	}
 	return eventStruct
 }
@@ -98,15 +99,11 @@ func (s *Server) marshalEvent(e *models.Event) *eventpb.Event {
 		log.Error(err.Error())
 	}
 
-	ts, err := ptypes.TimestampProto(t)
-	if err != nil {
-		log.Error(err.Error())
-	}
 	pbEvent := eventpb.Event{
 		Id:          uint32(e.Id),
 		Title:       e.Title,
 		Description: e.Description,
-		Date:        ts,
+		Date:        timestamppb.New(t),
 	}
 	return &pbEvent
 }
