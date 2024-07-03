@@ -37,6 +37,7 @@ func main() {
 	}
 	amqp := qc.GetConnection(c)
 	defer amqp.Close()
+
 	contextTimeout := time.Millisecond * 500
 	q := queue.NewEventQueue(c, l, amqp)
 	repo := postgres.NewPsqlRepository(db)

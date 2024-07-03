@@ -67,6 +67,7 @@ func metricsInterceptor(
 		"method": info.FullMethod,
 		"code":   code.String(),
 	}
+
 	latencies.With(labels).Observe(time.Since(handlingBeginsAt).Seconds())
 	grpcRequests.With(labels).Inc()
 
